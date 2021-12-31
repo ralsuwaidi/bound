@@ -10,7 +10,7 @@ services:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
     image: bound_local_django
-    container_name: django
+    container_name: bound_django
     depends_on:
       - postgres
       - redis
@@ -21,7 +21,7 @@ services:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
     ports:
-      - "8000:8000"
+      - "8001:8000"
     command: /start
 
   postgres:
@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
     image: bound_production_postgres
-    container_name: postgres
+    container_name: bound_postgres
     volumes:
       - local_postgres_data:/var/lib/postgresql/data:Z
       - local_postgres_data_backups:/backups:z
@@ -38,7 +38,7 @@ services:
 
   docs:
     image: bound_local_docs
-    container_name: docs
+    container_name: bound_docs
     build:
       context: .
       dockerfile: ./compose/local/docs/Dockerfile
@@ -49,23 +49,23 @@ services:
       - ./config:/app/config:z
       - ./bound:/app/bound:z
     ports:
-      - "7000:7000"
+      - "7003:7000"
     command: /start-docs
 
   mailhog:
     image: mailhog/mailhog:v1.0.0
-    container_name: mailhog
+    container_name: bound_mailhog
     ports:
-      - "8025:8025"
+      - "8026:8025"
 
   redis:
     image: redis:6
-    container_name: redis
+    container_name: bound_redis
 
   celeryworker:
     <<: *django
     image: bound_local_celeryworker
-    container_name: celeryworker
+    container_name: bound_celeryworker
     depends_on:
       - redis
       - postgres
@@ -76,7 +76,7 @@ services:
   celerybeat:
     <<: *django
     image: bound_local_celerybeat
-    container_name: celerybeat
+    container_name: bound_celerybeat
     depends_on:
       - redis
       - postgres
@@ -87,7 +87,7 @@ services:
   flower:
     <<: *django
     image: bound_local_flower
-    container_name: flower
+    container_name: bound_flower
     ports:
-      - "5555:5555"
+      - "5556:5555"
     command: /start-flower
